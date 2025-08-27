@@ -25,4 +25,8 @@ For Part 3, you need the following tools:
 
 * run `./debug.sh`
 
-**Troubleshooting**: Bochs has proven to be pretty unreliable. Check [this article](https://github.com/nanobyte-dev/nanobyte_os/wiki/Frequent-issues#bochs-doesnt-work) for some troubleshooting tips.
+## Help
+
+To release the keyboard and mouse: Press Ctrl + Alt + G.
+
+You will see the mouse cursor move freely out of the QEMU window. The keyboard will now type into your host machine's terminal or other applications.

@@ -11,7 +11,8 @@ For Part 3, you need the following tools:
 * `make`
 * `nasm`
 * `qemu-system-x86` for testing
-* your preferred text editor
+* your preferred text editor (i use VSCode)
+* your preferred hex editor (i use Ghex)
 
 ## Build instructions
 

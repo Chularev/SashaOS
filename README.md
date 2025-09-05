@@ -22,9 +22,12 @@ For Part 3, you need the following tools:
 
 * run `./run.sh`
 
-## Debugging with bochs
+## Debugging with gdb
 
-* run `./debug.sh`
+* run `./debug.sh`'
+* in new terminal run gdb
+* in gdb run `source init.gdb`
+* Then use stepi + enter
 
 ## Help
 

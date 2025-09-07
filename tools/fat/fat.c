@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+
 
 typedef uint8_t bool;
 #define true 1
@@ -172,6 +175,17 @@ int main(int argc, char *argv[])
         free(buffer);
         return -5;
     }
+
+    for (size_t i = 0; i < fileEntry->Size; i++)
+    {
+        if (isprint(buffer[i])) fputc(buffer[i], stdout);
+        else printf("<%02x>", buffer[i]);
+    }
+    printf("\n");
+
+    free(buffer);
+    free(g_Fat);
+    free(g_RootDirectory);
 
     return 0;
 }

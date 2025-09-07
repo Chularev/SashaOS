@@ -34,3 +34,5 @@ For Part 3, you need the following tools:
 To release the keyboard and mouse: Press Ctrl + Alt + G.
 
 You will see the mouse cursor move freely out of the QEMU window. The keyboard will now type into your host machine's terminal or other applications.
+
+[FAT12 Explanation](https://www.sqlpassion.at/archive/2022/03/03/reading-files-from-a-fat12-partition/)

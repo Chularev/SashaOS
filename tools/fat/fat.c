@@ -54,6 +54,39 @@ bool readFat(FILE* disk)
     return readSectors(disk, g_Header.ReservedSectors, g_Header.SectorsPerFat, g_Fat);
 }
 
+typedef struct 
+{
+    uint8_t Name[11];
+    uint8_t Attributes;
+    uint8_t _Reserved;
+    uint8_t CreatedTimeTenths;
+    uint16_t CreatedTime;
+    uint16_t CreatedDate;
+    uint16_t AccessedDate;
+    uint16_t FirstClusterHigh;
+    uint16_t ModifiedTime;
+    uint16_t ModifiedDate;
+    uint16_t FirstClusterLow;
+    uint32_t Size;
+} __attribute__((packed)) DirectoryEntry;
+
+DirectoryEntry* g_RootDirectory = NULL;
+uint32_t g_RootDirectoryEnd;
+
+bool readRootDirectory(FILE* disk)
+{
+    uint32_t lba = g_Header.ReservedSectors + g_Header.SectorsPerFat * g_Header.FatCount;
+    uint32_t size = sizeof(DirectoryEntry) * g_Header.DirEntryCount;
+    uint32_t sectors = (size / g_Header.BytesPerSector);
+    if (size % g_Header.BytesPerSector > 0)
+        sectors++;
+
+    g_RootDirectoryEnd = lba + sectors;
+    g_RootDirectory = (DirectoryEntry*) malloc(sectors * g_Header.BytesPerSector);
+    return readSectors(disk, lba, sectors, g_RootDirectory);
+}
+
+
 int main(int argc, char *argv[])
 {
     if (argc < 3) {
@@ -77,6 +110,14 @@ int main(int argc, char *argv[])
         free(g_Fat);
         return -3;
     }
+
+     if (!readRootDirectory(disk)) {
+        fprintf(stderr, "Could not read Root Directory!\n");
+        free(g_Fat);
+        free(g_RootDirectory);
+        return -4;
+    }
+
 
     return 0;
 }

@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 typedef uint8_t bool;
+#define true 1
+#define false 0
 
 typedef struct 
 {
@@ -27,14 +30,29 @@ typedef struct
     uint8_t VolumeLabel[11]; 
     uint8_t SystemId[8];
 
-} __attribute__((packed)) BootSector;
+} __attribute__((packed)) Header;
 
-BootSector g_BootSector;
-bool readBootSector(FILE* disk)
+Header g_Header;
+bool readHeader(FILE* disk)
 {
-    return fread(&g_BootSector, sizeof(g_BootSector), 1, disk) > 0;
+    return fread(&g_Header, sizeof(g_Header), 1, disk) > 0;
 }
 
+bool readSectors(FILE* disk, uint32_t lba, uint32_t count, void* bufferOut)
+{
+    bool ok = true;
+    ok = ok && (fseek(disk, lba * g_Header.BytesPerSector, SEEK_SET) == 0);
+    ok = ok && (fread(bufferOut, g_Header.BytesPerSector, count, disk) == count);
+    return ok;
+}
+
+
+uint8_t* g_Fat = NULL;
+bool readFat(FILE* disk)
+{
+    g_Fat = (uint8_t*) malloc(g_Header.SectorsPerFat * g_Header.BytesPerSector);
+    return readSectors(disk, g_Header.ReservedSectors, g_Header.SectorsPerFat, g_Fat);
+}
 
 int main(int argc, char *argv[])
 {
@@ -49,9 +67,15 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    if (!readBootSector(disk)) {
+    if (!readHeader(disk)) {
         fprintf(stderr, "Could not read boot sector!\n");
         return -2;
+    }
+
+    if (!readFat(disk)) {
+        fprintf(stderr, "Could not read FAT!\n");
+        free(g_Fat);
+        return -3;
     }
 
     return 0;

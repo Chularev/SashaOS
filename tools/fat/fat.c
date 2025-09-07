@@ -56,6 +56,9 @@ bool readFat(FILE* disk)
 
 typedef struct 
 {
+    // 8 bites file name
+    // 3 bites extension
+    // 8 + 3 = 11
     uint8_t Name[11];
     uint8_t Attributes;
     uint8_t _Reserved;
@@ -86,6 +89,20 @@ bool readRootDirectory(FILE* disk)
     return readSectors(disk, lba, sectors, g_RootDirectory);
 }
 
+
+DirectoryEntry* findFile(const char* name)
+{
+    for (uint32_t i = 0; i < g_Header.DirEntryCount; i++)
+    {
+        // 8 bites file name
+        // 3 bites extension
+        // 8 + 3 = 11
+        if (memcmp(name, g_RootDirectory[i].Name, 11) == 0)
+            return &g_RootDirectory[i];
+    }
+
+    return NULL;
+}
 
 int main(int argc, char *argv[])
 {
@@ -118,6 +135,13 @@ int main(int argc, char *argv[])
         return -4;
     }
 
+    DirectoryEntry* fileEntry = findFile(argv[2]);
+    if (!fileEntry) {
+        fprintf(stderr, "Could not find file %s!\n", argv[2]);
+        free(g_Fat);
+        free(g_RootDirectory);
+        return -5;
+    }
 
     return 0;
 }
